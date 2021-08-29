@@ -69,9 +69,9 @@ exports.register = async (req, res) => {
 			message: 'You have successfully registered',
 			data: {
 				id: user.id,
-				fullName: user.name,
+				fullName: user.fullName,
 				email: user.email,
-				role: user.role,
+				roleId: user.roleId,
 				avatar: user.avatar,
 				token,
 			},
@@ -142,9 +142,9 @@ exports.login = async (req, res) => {
 			message: 'You have successfully login',
 			data: {
 				id: user.id,
-				fullName: user.name,
+				fullName: user.fullName,
 				email: user.email,
-				role: user.role,
+				roleId: user.roleId,
 				avatar: user.avatar,
 				token,
 			},

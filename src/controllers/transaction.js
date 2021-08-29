@@ -205,6 +205,103 @@ exports.getTransaction = async (req, res) => {
 	}
 };
 
+//*-------------------------------------------- Get User Transaction --------------------------------------------*//
+exports.getUserTransactions = async (req, res) => {
+	try {
+		const { id } = req.user;
+		const transaction = await Transaction.findOne({
+			where: {
+				id,
+			},
+			attributes: {
+				exclude: ['createdAt', 'updatedAt', 'userId', 'UserId'],
+			},
+			include: [
+				{
+					model: User,
+					as: 'user',
+					attributes: {
+						exclude: [
+							'password',
+							'createdAt',
+							'updatedAt',
+							'deletedAt',
+							'userId',
+							'UserId',
+						],
+					},
+				},
+				{
+					model: TransactionProduct,
+					as: 'transactionProducts',
+					attributes: {
+						exclude: [
+							'createdAt',
+							'updatedAt',
+							'productId',
+							'ProductId',
+							'transactionId',
+							'TransactionId',
+						],
+					},
+					include: [
+						{
+							model: Product,
+							as: 'product',
+							attributes: {
+								exclude: ['createdAt', 'updatedAt', 'ProductId'],
+							},
+						},
+						{
+							model: TransactionTopping,
+							as: 'transactionToppings',
+							attributes: {
+								exclude: [
+									'transactionProductId',
+									'createdAt',
+									'updatedAt',
+									'TransactionProductId',
+									'ToppingId',
+									'toppingId',
+								],
+							},
+							include: [
+								{
+									model: Topping,
+									as: 'topping',
+									attributes: {
+										exclude: ['createdAt', 'updatedAt', 'ToppingId'],
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		});
+
+		if (!transaction) {
+			return res.status(400).send({
+				status: failed,
+				message: messageFailed('Get', id),
+				data: {
+					transaction: [],
+				},
+			});
+		}
+
+		res.send({
+			status: success,
+			message: messageSuccess('Get', id),
+			data: {
+				transaction,
+			},
+		});
+	} catch (err) {
+		errorResponse(err, res);
+	}
+};
+
 //*-------------------------------------------- Add Transaction --------------------------------------------*//
 exports.addTransaction = async (req, res) => {
 	try {
@@ -213,7 +310,7 @@ exports.addTransaction = async (req, res) => {
 		const transactionData = {
 			...body,
 			userId,
-			attachment: false,
+			attachment: null,
 		};
 		console.log(transactionData);
 
@@ -242,6 +339,7 @@ exports.addTransaction = async (req, res) => {
 	}
 };
 
+//*-------------------------------------------- Update Transaction --------------------------------------------*//
 exports.updateTransaction = async (req, res) => {
 	try {
 		const { id } = req.params;

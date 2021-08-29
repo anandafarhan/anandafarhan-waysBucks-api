@@ -139,11 +139,14 @@ exports.updateUser = async (req, res) => {
 			});
 		}
 
-		await User.update(req.body, {
-			where: {
-				id,
-			},
-		});
+		await User.update(
+			{ ...req.body, avatar: req.file.path },
+			{
+				where: {
+					id,
+				},
+			}
+		);
 
 		const updatedUser = await User.findOne({
 			where: {
