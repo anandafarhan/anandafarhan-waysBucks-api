@@ -211,7 +211,7 @@ exports.getUserTransactions = async (req, res) => {
 		const { id } = req.user;
 		const transaction = await Transaction.findOne({
 			where: {
-				id,
+				Userid: id,
 			},
 			attributes: {
 				exclude: ['createdAt', 'updatedAt', 'userId', 'UserId'],
