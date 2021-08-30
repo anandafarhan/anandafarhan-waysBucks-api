@@ -86,7 +86,7 @@ exports.getTransactions = async (req, res) => {
 			],
 		});
 
-		if (transactions.length === 0) {
+		if (transactions.length < 1) {
 			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
