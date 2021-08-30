@@ -9,6 +9,7 @@ const {
 	getUser,
 	updateUser,
 	deleteUser,
+	teapot,
 } = require('../controllers/user');
 
 const {
@@ -35,6 +36,7 @@ const {
 	updateTransaction,
 	getUserTransactions,
 } = require('../controllers/transaction');
+router.get('/', teapot);
 
 //* --------------------------  AUTH  ---------------------------- *//
 router.post('/auth/register', register);
@@ -43,7 +45,7 @@ router.post('/auth/login', login);
 //* -----------------------  USER ROUTE  ------------------------- *//
 router.get('/users', authAdmin, getUsers);
 router.get('/user/:id', authAdmin, getUser);
-router.patch('/user/:id', auth, uploadFile('avatar'), updateUser);
+// router.patch('/user/:id', authAdmin, uploadFile('avatar'), updateUser);
 router.delete('/user/:id', authAdmin, deleteUser);
 
 //* ----------------------  PRODUCT ROUTE  ----------------------- *//
@@ -63,9 +65,12 @@ router.delete('/topping/:id', authAdmin, deleteTopping);
 //* --------------------  TRANSACTION ROUTE  ---------------------- *//
 router.get('/transactions', authAdmin, getTransactions);
 router.get('/transaction/:id', authAdmin, getTransaction);
-router.get('/my-transactions', auth, getUserTransactions);
-router.post('/transaction', auth, addTransaction);
 router.patch('/transaction/:id', authAdmin, updateTransaction);
 router.delete('/transaction/:id', authAdmin, deleteTransaction);
+
+//* --------------------  USER TOKEN ROUTE  ---------------------- *//
+router.post('/transaction', auth, addTransaction);
+router.get('/my-transactions', auth, getUserTransactions);
+router.patch('/user', auth, uploadFile('avatar'), updateUser);
 
 module.exports = router;

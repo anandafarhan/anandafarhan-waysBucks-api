@@ -16,7 +16,7 @@ exports.auth = async (req, res, next) => {
 		req.user = verified;
 		next();
 	} catch (error) {
-		return res.status(401).json({
+		return res.status(403).json({
 			status: 'failed',
 			message: 'Invalid Token',
 		});
@@ -39,7 +39,7 @@ exports.authAdmin = async (req, res, next) => {
 		req.user = verified;
 		next();
 	} catch (error) {
-		return res.status(401).json({
+		return res.status(403).json({
 			status: 'failed',
 			message: 'Invalid Token',
 		});

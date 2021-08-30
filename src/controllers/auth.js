@@ -64,7 +64,7 @@ exports.register = async (req, res) => {
 			expiresIn: '24h',
 		});
 
-		res.send({
+		res.status(201).send({
 			status: success,
 			message: 'You have successfully registered',
 			data: {

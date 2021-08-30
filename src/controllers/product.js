@@ -27,7 +27,7 @@ exports.getProducts = async (req, res) => {
 		});
 
 		if (products.length < 1) {
-			return res.send({
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -91,7 +91,7 @@ exports.addProduct = async (req, res) => {
 				id: newProduct.id,
 			},
 		});
-		res.send({
+		res.status(201).send({
 			status: success,
 			message: messageSuccess('Create'),
 			data: { newProductData },

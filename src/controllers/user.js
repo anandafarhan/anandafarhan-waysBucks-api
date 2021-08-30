@@ -1,4 +1,5 @@
 const { User, Role } = require('../../models');
+const bcrypt = require('bcrypt');
 
 //* Re-Useable Error message
 const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
@@ -33,7 +34,7 @@ exports.getUsers = async (req, res) => {
 		});
 
 		if (users.length < 1) {
-			return res.send({
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -121,7 +122,7 @@ exports.getUser = async (req, res) => {
 //*-------------------------------------------- Update User --------------------------------------------*//
 exports.updateUser = async (req, res) => {
 	try {
-		const { id } = req.params;
+		const { id } = req.user;
 
 		const isUserExist = await User.findOne({
 			where: {
@@ -139,14 +140,26 @@ exports.updateUser = async (req, res) => {
 			});
 		}
 
-		await User.update(
-			{ ...req.body, avatar: req.file.path },
-			{
-				where: {
-					id,
-				},
-			}
-		);
+		if (req.body.password) {
+			const hashedPassword = await bcrypt.hash(req.body.password, 10);
+			await User.update(
+				{ ...req.body, password: hashedPassword, avatar: req.file.path },
+				{
+					where: {
+						id,
+					},
+				}
+			);
+		} else {
+			await User.update(
+				{ ...req.body, avatar: req.file.path },
+				{
+					where: {
+						id,
+					},
+				}
+			);
+		}
 
 		const updatedUser = await User.findOne({
 			where: {
@@ -200,4 +213,12 @@ exports.deleteUser = async (req, res) => {
 	} catch (err) {
 		errorResponse(err, res);
 	}
+};
+
+exports.teapot = (req, res) => {
+	res
+		.status(418)
+		.end(
+			'The server refuses to brew coffee because it is, permanently, a teapot.'
+		);
 };
