@@ -87,7 +87,7 @@ exports.getTransactions = async (req, res) => {
 		});
 
 		if (transactions.length === 0) {
-			return res.send({
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -281,9 +281,9 @@ exports.getUserTransactions = async (req, res) => {
 		});
 
 		if (!transaction) {
-			return res.status(400).send({
+			return res.status(204).send({
 				status: failed,
-				message: messageFailed('Get', id),
+				message: messageEmpty,
 				data: {
 					transaction: [],
 				},
@@ -302,7 +302,7 @@ exports.getUserTransactions = async (req, res) => {
 	}
 };
 
-//*-------------------------------------------- Add Transaction --------------------------------------------*//
+//*-------------------------------------------- Add User Transaction --------------------------------------------*//
 exports.addTransaction = async (req, res) => {
 	try {
 		const { body, user } = req;
@@ -327,9 +327,9 @@ exports.addTransaction = async (req, res) => {
 			],
 		});
 
-		res.send({
+		res.status(201).send({
 			status: success,
-			message: messageSuccess('Add'),
+			message: messageSuccess('Add User'),
 			data: {
 				transaction,
 			},

@@ -27,7 +27,7 @@ exports.getToppings = async (req, res) => {
 		});
 
 		if (toppings.length < 1) {
-			return res.send({
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -91,7 +91,7 @@ exports.addTopping = async (req, res) => {
 				id: newTopping.id,
 			},
 		});
-		res.send({
+		res.status(201).send({
 			status: success,
 			message: messageSuccess('Create'),
 			data: { newToppingData },
