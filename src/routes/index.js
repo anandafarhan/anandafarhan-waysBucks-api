@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { auth, authAdmin } = require('../middlewares/auth');
-const { register, login } = require('../controllers/auth');
+const { register, login, checkAuth } = require('../controllers/auth');
 const { uploadFile } = require('../middlewares/uploadFile');
 
 const {
@@ -41,6 +41,7 @@ router.get('/', teapot);
 //* --------------------------  AUTH  ---------------------------- *//
 router.post('/auth/register', register);
 router.post('/auth/login', login);
+router.get('/auth', auth, checkAuth);
 
 //* -----------------------  USER ROUTE  ------------------------- *//
 router.get('/users', authAdmin, getUsers);
@@ -65,11 +66,11 @@ router.delete('/topping/:id', authAdmin, deleteTopping);
 //* --------------------  TRANSACTION ROUTE  ---------------------- *//
 router.get('/transactions', authAdmin, getTransactions);
 router.get('/transaction/:id', authAdmin, getTransaction);
-router.patch('/transaction/:id', authAdmin, updateTransaction);
+router.patch('/transaction/:id', auth, updateTransaction);
 router.delete('/transaction/:id', authAdmin, deleteTransaction);
 
 //* --------------------  USER TOKEN ROUTE  ---------------------- *//
-router.post('/transaction', auth, addTransaction);
+router.post('/transaction', auth, uploadFile('attachment'), addTransaction);
 router.get('/my-transactions', auth, getUserTransactions);
 router.patch('/user', auth, uploadFile('avatar'), updateUser);
 

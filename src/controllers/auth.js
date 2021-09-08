@@ -71,7 +71,7 @@ exports.register = async (req, res) => {
 				id: user.id,
 				fullName: user.fullName,
 				email: user.email,
-				roleId: user.roleId,
+				role: user.roleId === 1 ? 'admin' : 'user',
 				avatar: user.avatar,
 				token,
 			},
@@ -125,17 +125,11 @@ exports.login = async (req, res) => {
 			});
 		}
 
-		const payload = { id: user.id };
-		let token = null;
-		if (user.roleId === 1) {
-			token = jwt.sign(payload, process.env.JWT_PRIVATE_KEY_A, {
-				expiresIn: '24h',
-			});
-		} else {
-			token = jwt.sign(payload, process.env.JWT_PRIVATE_KEY, {
-				expiresIn: '24h',
-			});
-		}
+		const payload = { id: user.id, roleId: user.roleId };
+
+		let token = jwt.sign(payload, process.env.JWT_PRIVATE_KEY, {
+			expiresIn: '24h',
+		});
 
 		res.send({
 			status: success,
@@ -144,7 +138,7 @@ exports.login = async (req, res) => {
 				id: user.id,
 				fullName: user.fullName,
 				email: user.email,
-				roleId: user.roleId,
+				role: user.roleId === 1 ? 'admin' : 'user',
 				avatar: user.avatar,
 				token,
 			},
@@ -154,4 +148,28 @@ exports.login = async (req, res) => {
 	}
 };
 
-//TODO-------------------------------------------- Check User Auth --------------------------------------------*//
+//*-------------------------------------------- Check User Auth --------------------------------------------*//
+exports.checkAuth = async (req, res) => {
+	try {
+		const { id } = req.user;
+		const user = await User.findOne({
+			where: {
+				id,
+			},
+		});
+
+		res.send({
+			status: success,
+			message: 'You are already logged in',
+			data: {
+				id: user.id,
+				fullName: user.fullName,
+				email: user.email,
+				role: user.roleId === 1 ? 'admin' : 'user',
+				avatar: user.avatar,
+			},
+		});
+	} catch (err) {
+		errorResponse(err, res);
+	}
+};

@@ -34,10 +34,10 @@ exports.authAdmin = async (req, res, next) => {
 
 	try {
 		const token = header.replace('Bearer ', '');
-		const verified = jwt.verify(token, process.env.JWT_PRIVATE_KEY_A);
+		const verified = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
 		// console.log(verified);
 		req.user = verified;
-		next();
+		req.user.roleId === 1 ? next() : console.error('Unauthorized');
 	} catch (error) {
 		return res.status(403).json({
 			status: 'failed',

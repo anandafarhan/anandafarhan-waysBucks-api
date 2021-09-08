@@ -31,53 +31,32 @@ exports.getTransactions = async (req, res) => {
 			attributes: {
 				exclude: ['userId', 'createdAt', 'updatedAt'],
 			},
+			order: [['createdAt', 'DESC']],
 			include: [
 				{
 					model: User,
 					as: 'user',
-					attributes: {
-						exclude: ['id', 'password', 'roleId', 'createdAt', 'updatedAt'],
-					},
+					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
 					as: 'transactionProducts',
-					attributes: {
-						exclude: [
-							'id',
-							'transactionId',
-							'productId',
-							'createdAt',
-							'updatedAt',
-						],
-					},
+					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
 							as: 'product',
-							attributes: {
-								exclude: ['id', 'createdAt', 'updatedAt'],
-							},
+							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
 							as: 'transactionToppings',
-							attributes: {
-								exclude: [
-									'id',
-									'toppingId',
-									'TransactionProductId',
-									'createdAt',
-									'updatedAt',
-								],
-							},
+							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
 									as: 'topping',
-									attributes: {
-										exclude: ['id', 'createdAt', 'updatedAt'],
-									},
+									attributes: ['name', 'price', 'image'],
 								},
 							],
 						},
@@ -117,57 +96,33 @@ exports.getTransaction = async (req, res) => {
 				id,
 			},
 			attributes: {
-				exclude: ['createdAt', 'updatedAt', 'userId', 'UserId'],
+				exclude: ['userId', 'createdAt', 'updatedAt'],
 			},
 			include: [
 				{
 					model: User,
 					as: 'user',
-					attributes: {
-						exclude: ['password', 'createdAt', 'updatedAt', 'userId', 'UserId'],
-					},
+					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
 					as: 'transactionProducts',
-					attributes: {
-						exclude: [
-							'createdAt',
-							'updatedAt',
-							'productId',
-							'ProductId',
-							'transactionId',
-							'TransactionId',
-						],
-					},
+					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
 							as: 'product',
-							attributes: {
-								exclude: ['createdAt', 'updatedAt', 'ProductId'],
-							},
+							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
 							as: 'transactionToppings',
-							attributes: {
-								exclude: [
-									'transactionProductId',
-									'createdAt',
-									'updatedAt',
-									'TransactionProductId',
-									'ToppingId',
-									'toppingId',
-								],
-							},
+							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
 									as: 'topping',
-									attributes: {
-										exclude: ['createdAt', 'updatedAt', 'ToppingId'],
-									},
+									attributes: ['name', 'price', 'image'],
 								},
 							],
 						},
@@ -202,62 +157,39 @@ exports.getTransaction = async (req, res) => {
 exports.getUserTransactions = async (req, res) => {
 	try {
 		const { id } = req.user;
-		const transaction = await Transaction.findOne({
+		const transaction = await Transaction.findAll({
 			where: {
 				Userid: id,
 			},
 			attributes: {
-				exclude: ['createdAt', 'updatedAt', 'userId', 'UserId'],
+				exclude: ['userId', 'updatedAt'],
 			},
+			order: [['createdAt', 'DESC']],
 			include: [
 				{
 					model: User,
 					as: 'user',
-					attributes: {
-						exclude: ['password', 'createdAt', 'updatedAt', 'userId', 'UserId'],
-					},
+					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
 					as: 'transactionProducts',
-					attributes: {
-						exclude: [
-							'createdAt',
-							'updatedAt',
-							'productId',
-							'ProductId',
-							'transactionId',
-							'TransactionId',
-						],
-					},
+					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
 							as: 'product',
-							attributes: {
-								exclude: ['createdAt', 'updatedAt', 'ProductId'],
-							},
+							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
 							as: 'transactionToppings',
-							attributes: {
-								exclude: [
-									'transactionProductId',
-									'createdAt',
-									'updatedAt',
-									'TransactionProductId',
-									'ToppingId',
-									'toppingId',
-								],
-							},
+							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
 									as: 'topping',
-									attributes: {
-										exclude: ['createdAt', 'updatedAt', 'ToppingId'],
-									},
+									attributes: ['name', 'price', 'image'],
 								},
 							],
 						},
@@ -295,10 +227,11 @@ exports.addTransaction = async (req, res) => {
 		const userId = user.id;
 		const transactionData = {
 			...body,
+			transactionProducts: JSON.parse(req.body.transactionProducts),
+			status: 'Waiting Approval',
 			userId,
-			attachment: null,
+			attachment: req.file.path,
 		};
-		console.log(transactionData);
 
 		const transaction = await Transaction.create(transactionData, {
 			include: [
