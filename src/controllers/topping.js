@@ -1,13 +1,11 @@
-const { Topping } = require('../../models');
+const { Topping, TransactionTopping, Sequelize } = require('../../models');
 
 //* Re-Useable Error message
 const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
 	success: 'success',
 	failed: 'failed',
-	messageSuccess: (type, id) =>
-		`${type} Topping/s success${id ? ` id : ${id}` : ``}`,
-	messageFailed: (type, id) =>
-		`${type} Topping/s fail${id ? ` id : ${id}` : ``}`,
+	messageSuccess: (type, id) => `${type} Topping/s success${id ? ` id : ${id}` : ``}`,
+	messageFailed: (type, id) => `${type} Topping/s fail${id ? ` id : ${id}` : ``}`,
 	messageEmpty: `No data found`,
 };
 
@@ -24,10 +22,14 @@ exports.getToppings = async (req, res) => {
 			attributes: {
 				exclude: ['createdAt', 'updatedAt'],
 			},
+			include: {
+				model: TransactionTopping,
+				attributes: ['id'],
+			},
 		});
 
 		if (toppings.length < 1) {
-			return res.send({
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -91,7 +93,7 @@ exports.addTopping = async (req, res) => {
 				id: newTopping.id,
 			},
 		});
-		res.send({
+		res.status(201).send({
 			status: success,
 			message: messageSuccess('Create'),
 			data: { newToppingData },
@@ -127,6 +129,51 @@ exports.updateTopping = async (req, res) => {
 				id,
 			},
 		});
+
+		const updatedTopping = await Topping.findOne({
+			where: {
+				id,
+			},
+		});
+		res.send({
+			status: success,
+			message: messageSuccess('Update', id),
+			data: { updatedTopping },
+		});
+	} catch (err) {
+		errorResponse(err, res);
+	}
+};
+
+//*-------------------------------------------- Update Topping with Image--------------------------------------------*//
+exports.updateToppingImg = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const isToppingExist = await Topping.findOne({
+			where: {
+				id,
+			},
+		});
+
+		if (!isToppingExist) {
+			return res.status(400).send({
+				status: failed,
+				message: messageEmpty,
+				data: {
+					topping: [],
+				},
+			});
+		}
+
+		await Topping.update(
+			{ ...req.body, image: req.file.path },
+			{
+				where: {
+					id,
+				},
+			}
+		);
 
 		const updatedTopping = await Topping.findOne({
 			where: {

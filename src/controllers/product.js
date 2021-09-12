@@ -1,13 +1,11 @@
-const { Product } = require('../../models');
+const { Product, TransactionProduct } = require('../../models');
 
 //* Re-Useable Error message
 const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
 	success: 'success',
 	failed: 'failed',
-	messageSuccess: (type, id) =>
-		`${type} Product/s success${id ? ` id : ${id}` : ``}`,
-	messageFailed: (type, id) =>
-		`${type} Product/s fail${id ? ` id : ${id}` : ``}`,
+	messageSuccess: (type, id) => `${type} Product/s success${id ? ` id : ${id}` : ``}`,
+	messageFailed: (type, id) => `${type} Product/s fail${id ? ` id : ${id}` : ``}`,
 	messageEmpty: `No data found`,
 };
 
@@ -24,10 +22,14 @@ exports.getProducts = async (req, res) => {
 			attributes: {
 				exclude: ['createdAt', 'updatedAt'],
 			},
+			include: {
+				model: TransactionProduct,
+				attributes: ['qty'],
+			},
 		});
 
 		if (products.length < 1) {
-			return res.send({
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -91,7 +93,7 @@ exports.addProduct = async (req, res) => {
 				id: newProduct.id,
 			},
 		});
-		res.send({
+		res.status(201).send({
 			status: success,
 			message: messageSuccess('Create'),
 			data: { newProductData },
@@ -127,6 +129,51 @@ exports.updateProduct = async (req, res) => {
 				id,
 			},
 		});
+
+		const updatedProduct = await Product.findOne({
+			where: {
+				id,
+			},
+		});
+		res.send({
+			status: success,
+			message: messageSuccess('Update', id),
+			data: { updatedProduct },
+		});
+	} catch (err) {
+		errorResponse(err, res);
+	}
+};
+
+//*-------------------------------------------- Update Product with Image --------------------------------------------*//
+exports.updateProductImg = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const isProductExist = await Product.findOne({
+			where: {
+				id,
+			},
+		});
+
+		if (!isProductExist) {
+			return res.status(400).send({
+				status: failed,
+				message: messageEmpty,
+				data: {
+					product: [],
+				},
+			});
+		}
+
+		await Product.update(
+			{ ...req.body, image: req.file.path },
+			{
+				where: {
+					id,
+				},
+			}
+		);
 
 		const updatedProduct = await Product.findOne({
 			where: {

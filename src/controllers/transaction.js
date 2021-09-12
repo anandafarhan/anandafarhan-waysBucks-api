@@ -11,10 +11,8 @@ const {
 const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
 	success: 'success',
 	failed: 'failed',
-	messageSuccess: (type, id) =>
-		`${type} Transaction/s success${id ? ` id : ${id}` : ``}`,
-	messageFailed: (type, id) =>
-		`${type} Transaction/s fail${id ? ` id : ${id}` : ``}`,
+	messageSuccess: (type, id) => `${type} Transaction/s success${id ? ` id : ${id}` : ``}`,
+	messageFailed: (type, id) => `${type} Transaction/s fail${id ? ` id : ${id}` : ``}`,
 	messageEmpty: `No data found`,
 };
 
@@ -31,53 +29,32 @@ exports.getTransactions = async (req, res) => {
 			attributes: {
 				exclude: ['userId', 'createdAt', 'updatedAt'],
 			},
+			order: [['createdAt', 'DESC']],
 			include: [
 				{
 					model: User,
 					as: 'user',
-					attributes: {
-						exclude: ['id', 'password', 'roleId', 'createdAt', 'updatedAt'],
-					},
+					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
 					as: 'transactionProducts',
-					attributes: {
-						exclude: [
-							'id',
-							'transactionId',
-							'productId',
-							'createdAt',
-							'updatedAt',
-						],
-					},
+					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
 							as: 'product',
-							attributes: {
-								exclude: ['id', 'createdAt', 'updatedAt'],
-							},
+							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
 							as: 'transactionToppings',
-							attributes: {
-								exclude: [
-									'id',
-									'toppingId',
-									'TransactionProductId',
-									'createdAt',
-									'updatedAt',
-								],
-							},
+							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
 									as: 'topping',
-									attributes: {
-										exclude: ['id', 'createdAt', 'updatedAt'],
-									},
+									attributes: ['name', 'price', 'image'],
 								},
 							],
 						},
@@ -86,8 +63,8 @@ exports.getTransactions = async (req, res) => {
 			],
 		});
 
-		if (transactions.length === 0) {
-			return res.send({
+		if (transactions.length < 1) {
+			return res.status(204).send({
 				status: failed,
 				message: messageEmpty,
 				data: {
@@ -117,64 +94,33 @@ exports.getTransaction = async (req, res) => {
 				id,
 			},
 			attributes: {
-				exclude: ['createdAt', 'updatedAt', 'userId', 'UserId'],
+				exclude: ['userId', 'createdAt', 'updatedAt'],
 			},
 			include: [
 				{
 					model: User,
 					as: 'user',
-					attributes: {
-						exclude: [
-							'password',
-							'createdAt',
-							'updatedAt',
-							'deletedAt',
-							'userId',
-							'UserId',
-						],
-					},
+					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
 					as: 'transactionProducts',
-					attributes: {
-						exclude: [
-							'createdAt',
-							'updatedAt',
-							'productId',
-							'ProductId',
-							'transactionId',
-							'TransactionId',
-						],
-					},
+					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
 							as: 'product',
-							attributes: {
-								exclude: ['createdAt', 'updatedAt', 'ProductId'],
-							},
+							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
 							as: 'transactionToppings',
-							attributes: {
-								exclude: [
-									'transactionProductId',
-									'createdAt',
-									'updatedAt',
-									'TransactionProductId',
-									'ToppingId',
-									'toppingId',
-								],
-							},
+							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
 									as: 'topping',
-									attributes: {
-										exclude: ['createdAt', 'updatedAt', 'ToppingId'],
-									},
+									attributes: ['name', 'price', 'image'],
 								},
 							],
 						},
@@ -209,69 +155,39 @@ exports.getTransaction = async (req, res) => {
 exports.getUserTransactions = async (req, res) => {
 	try {
 		const { id } = req.user;
-		const transaction = await Transaction.findOne({
+		const transaction = await Transaction.findAll({
 			where: {
-				id,
+				Userid: id,
 			},
 			attributes: {
-				exclude: ['createdAt', 'updatedAt', 'userId', 'UserId'],
+				exclude: ['userId', 'updatedAt'],
 			},
+			order: [['createdAt', 'DESC']],
 			include: [
 				{
 					model: User,
 					as: 'user',
-					attributes: {
-						exclude: [
-							'password',
-							'createdAt',
-							'updatedAt',
-							'deletedAt',
-							'userId',
-							'UserId',
-						],
-					},
+					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
 					as: 'transactionProducts',
-					attributes: {
-						exclude: [
-							'createdAt',
-							'updatedAt',
-							'productId',
-							'ProductId',
-							'transactionId',
-							'TransactionId',
-						],
-					},
+					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
 							as: 'product',
-							attributes: {
-								exclude: ['createdAt', 'updatedAt', 'ProductId'],
-							},
+							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
 							as: 'transactionToppings',
-							attributes: {
-								exclude: [
-									'transactionProductId',
-									'createdAt',
-									'updatedAt',
-									'TransactionProductId',
-									'ToppingId',
-									'toppingId',
-								],
-							},
+							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
 									as: 'topping',
-									attributes: {
-										exclude: ['createdAt', 'updatedAt', 'ToppingId'],
-									},
+									attributes: ['name', 'price', 'image'],
 								},
 							],
 						},
@@ -281,9 +197,9 @@ exports.getUserTransactions = async (req, res) => {
 		});
 
 		if (!transaction) {
-			return res.status(400).send({
+			return res.status(204).send({
 				status: failed,
-				message: messageFailed('Get', id),
+				message: messageEmpty,
 				data: {
 					transaction: [],
 				},
@@ -302,17 +218,18 @@ exports.getUserTransactions = async (req, res) => {
 	}
 };
 
-//*-------------------------------------------- Add Transaction --------------------------------------------*//
+//*-------------------------------------------- Add User Transaction --------------------------------------------*//
 exports.addTransaction = async (req, res) => {
 	try {
 		const { body, user } = req;
 		const userId = user.id;
 		const transactionData = {
 			...body,
+			transactionProducts: JSON.parse(req.body.transactionProducts),
+			status: 'Waiting Approval',
 			userId,
-			attachment: null,
+			attachment: req.file.path,
 		};
-		console.log(transactionData);
 
 		const transaction = await Transaction.create(transactionData, {
 			include: [
@@ -327,9 +244,9 @@ exports.addTransaction = async (req, res) => {
 			],
 		});
 
-		res.send({
+		res.status(201).send({
 			status: success,
-			message: messageSuccess('Add'),
+			message: messageSuccess('Add User'),
 			data: {
 				transaction,
 			},
@@ -417,6 +334,50 @@ exports.deleteTransaction = async (req, res) => {
 			message: messageSuccess('Delete', id),
 			data: {
 				transaction: null,
+			},
+		});
+	} catch (err) {
+		return errorResponse(err, res);
+	}
+};
+
+//*-------------------------------------------- Get Transaction Product Count  --------------------------------------------*//
+exports.getTransactionProductCount = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const response = await TransactionProduct.count({
+			where: {
+				productId: id,
+			},
+		});
+		res.send({
+			status: success,
+			message: messageSuccess('Get Product Count', id),
+			data: {
+				count: response,
+			},
+		});
+	} catch (err) {
+		return errorResponse(err, res);
+	}
+};
+
+//*-------------------------------------------- Get Transaction Topping Count  --------------------------------------------*//
+exports.getTransactionToppingCount = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const response = await TransactionTopping.count({
+			where: {
+				toppingId: id,
+			},
+		});
+		res.send({
+			status: success,
+			message: messageSuccess('Get Topping Count', id),
+			data: {
+				count: response,
 			},
 		});
 	} catch (err) {

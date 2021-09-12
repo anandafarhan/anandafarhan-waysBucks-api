@@ -68,8 +68,6 @@ exports.uploadFile = (fieldName) => {
 				});
 			}
 
-			console.log(req.file);
-
 			return next();
 		});
 	};
