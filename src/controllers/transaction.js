@@ -11,10 +11,8 @@ const {
 const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
 	success: 'success',
 	failed: 'failed',
-	messageSuccess: (type, id) =>
-		`${type} Transaction/s success${id ? ` id : ${id}` : ``}`,
-	messageFailed: (type, id) =>
-		`${type} Transaction/s fail${id ? ` id : ${id}` : ``}`,
+	messageSuccess: (type, id) => `${type} Transaction/s success${id ? ` id : ${id}` : ``}`,
+	messageFailed: (type, id) => `${type} Transaction/s fail${id ? ` id : ${id}` : ``}`,
 	messageEmpty: `No data found`,
 };
 
@@ -336,6 +334,50 @@ exports.deleteTransaction = async (req, res) => {
 			message: messageSuccess('Delete', id),
 			data: {
 				transaction: null,
+			},
+		});
+	} catch (err) {
+		return errorResponse(err, res);
+	}
+};
+
+//*-------------------------------------------- Get Transaction Product Count  --------------------------------------------*//
+exports.getTransactionProductCount = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const response = await TransactionProduct.count({
+			where: {
+				productId: id,
+			},
+		});
+		res.send({
+			status: success,
+			message: messageSuccess('Get Product Count', id),
+			data: {
+				count: response,
+			},
+		});
+	} catch (err) {
+		return errorResponse(err, res);
+	}
+};
+
+//*-------------------------------------------- Get Transaction Topping Count  --------------------------------------------*//
+exports.getTransactionToppingCount = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const response = await TransactionTopping.count({
+			where: {
+				toppingId: id,
+			},
+		});
+		res.send({
+			status: success,
+			message: messageSuccess('Get Topping Count', id),
+			data: {
+				count: response,
 			},
 		});
 	} catch (err) {
