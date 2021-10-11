@@ -11,7 +11,7 @@ module.exports = {
 			transactionId: {
 				type: Sequelize.INTEGER,
 				references: {
-					model: 'transactions',
+					model: 'Transactions',
 					key: 'id',
 				},
 				onUpdate: 'CASCADE',
@@ -20,7 +20,7 @@ module.exports = {
 			productId: {
 				type: Sequelize.INTEGER,
 				references: {
-					model: 'products',
+					model: 'Products',
 					key: 'id',
 				},
 				onUpdate: 'CASCADE',
@@ -45,6 +45,6 @@ module.exports = {
 		});
 	},
 	down: async (queryInterface, Sequelize) => {
-		await queryInterface.dropTable('transactionProducts');
+		await queryInterface.dropTable('TransactionProducts');
 	},
 };

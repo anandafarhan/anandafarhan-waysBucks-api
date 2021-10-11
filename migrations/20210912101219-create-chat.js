@@ -14,7 +14,7 @@ module.exports = {
 			idSender: {
 				type: Sequelize.INTEGER,
 				references: {
-					model: 'users',
+					model: 'Users',
 					key: 'id',
 				},
 				onUpdate: 'CASCADE',
@@ -23,7 +23,7 @@ module.exports = {
 			idRecipient: {
 				type: Sequelize.INTEGER,
 				references: {
-					model: 'users',
+					model: 'Users',
 					key: 'id',
 				},
 				onUpdate: 'CASCADE',
