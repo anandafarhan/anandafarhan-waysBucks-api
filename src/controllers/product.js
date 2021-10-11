@@ -11,7 +11,7 @@ const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
 
 //* Re-Useable Error response
 const errorResponse = (err, res) => {
-	console.log(err);
+	console.log(err, res);
 	res.status(500).send({ error: { message: 'Server Error' } });
 };
 
