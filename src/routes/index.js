@@ -13,6 +13,7 @@ const {
 	updateProduct,
 	deleteProduct,
 	updateProductImg,
+	getAvailableProducts,
 } = require('../controllers/product');
 
 const {
@@ -22,6 +23,7 @@ const {
 	updateTopping,
 	deleteTopping,
 	updateToppingImg,
+	getAvailableToppings,
 } = require('../controllers/topping');
 
 const {
@@ -34,6 +36,15 @@ const {
 	getTransactionProductCount,
 	getTransactionToppingCount,
 } = require('../controllers/transaction');
+const {
+	getAddresses,
+	getUserAddresses,
+	getAddress,
+	addUserAddress,
+	updateUserAddress,
+	deleteUserAddress,
+	setPrimaryUserAddress,
+} = require('../controllers/address');
 router.get('/', teapot);
 
 //* --------------------------  AUTH  ---------------------------- *//
@@ -49,6 +60,7 @@ router.delete('/user/:id', authAdmin, deleteUser);
 
 //* ----------------------  PRODUCT ROUTE  ----------------------- *//
 router.get('/products', getProducts);
+router.get('/avlProducts', getAvailableProducts);
 router.get('/product/:id', getProduct);
 router.post('/product', authAdmin, uploadFile('image'), addProduct);
 router.patch('/productImg/:id', authAdmin, uploadFile('image'), updateProductImg);
@@ -57,6 +69,7 @@ router.delete('/product/:id', authAdmin, deleteProduct);
 
 //* ----------------------  TOPPING ROUTE  ----------------------- *//
 router.get('/toppings', getToppings);
+router.get('/avlToppings', getAvailableToppings);
 router.get('/topping/:id', getTopping);
 router.post('/topping', authAdmin, uploadFile('image'), addTopping);
 router.patch('/toppingImg/:id', authAdmin, uploadFile('image'), updateToppingImg);
@@ -77,5 +90,14 @@ router.get('/tToppingCount/:id', getTransactionToppingCount);
 router.post('/transaction', auth, uploadFile('attachment'), addTransaction);
 router.get('/my-transactions', auth, getUserTransactions);
 router.patch('/user', auth, uploadFile('avatar'), updateUser);
+
+//* --------------------  USER ADDRESS ROUTE  ---------------------- *//
+router.get('/addresses', authAdmin, getAddresses);
+router.get('/address/:id', authAdmin, getAddress);
+router.get('/my-addresses', auth, getUserAddresses);
+router.post('/address', auth, addUserAddress);
+router.patch('/address/:id', auth, updateUserAddress);
+router.patch('/setPrimaryAddress/:id', auth, setPrimaryUserAddress);
+router.delete('/address/:id', auth, deleteUserAddress);
 
 module.exports = router;

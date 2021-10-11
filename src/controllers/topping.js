@@ -48,6 +48,42 @@ exports.getToppings = async (req, res) => {
 	}
 };
 
+//*-------------------------------------------- Get All Available Topping --------------------------------------------*//
+exports.getAvailableToppings = async (req, res) => {
+	try {
+		const toppings = await Topping.findAll({
+			where: {
+				status: true,
+			},
+			attributes: {
+				exclude: ['createdAt', 'updatedAt'],
+			},
+			include: {
+				model: TransactionTopping,
+				attributes: ['id'],
+			},
+		});
+
+		if (toppings.length < 1) {
+			return res.status(204).send({
+				status: failed,
+				message: messageEmpty,
+				data: {
+					toppings: [],
+				},
+			});
+		}
+
+		res.send({
+			status: success,
+			message: messageSuccess('Get'),
+			data: { toppings },
+		});
+	} catch (err) {
+		errorResponse(err, res);
+	}
+};
+
 //*-------------------------------------------- Get Topping by Id --------------------------------------------*//
 exports.getTopping = async (req, res) => {
 	try {

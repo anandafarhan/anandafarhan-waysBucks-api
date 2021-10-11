@@ -48,6 +48,42 @@ exports.getProducts = async (req, res) => {
 	}
 };
 
+//*-------------------------------------------- Get All Available Product --------------------------------------------*//
+exports.getAvailableProducts = async (req, res) => {
+	try {
+		const products = await Product.findAll({
+			where: {
+				status: true,
+			},
+			attributes: {
+				exclude: ['createdAt', 'updatedAt'],
+			},
+			include: {
+				model: TransactionProduct,
+				attributes: ['qty'],
+			},
+		});
+
+		if (products.length < 1) {
+			return res.status(204).send({
+				status: failed,
+				message: messageEmpty,
+				data: {
+					product: [],
+				},
+			});
+		}
+
+		res.send({
+			status: success,
+			message: messageSuccess('Get'),
+			data: { products },
+		});
+	} catch (err) {
+		errorResponse(err, res);
+	}
+};
+
 //*-------------------------------------------- Get Product by Id --------------------------------------------*//
 exports.getProduct = async (req, res) => {
 	try {

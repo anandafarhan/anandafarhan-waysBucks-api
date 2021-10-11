@@ -6,6 +6,12 @@ const {
 	Topping,
 	User,
 } = require('../../models');
+const midtransClient = require('midtrans-client');
+
+let snap = new midtransClient.Snap({
+	isProduction: false,
+	serverKey: process.env.SERVER_KEY,
+});
 
 //* Re-Useable Error message
 const { success, failed, messageSuccess, messageFailed, messageEmpty } = {
@@ -27,7 +33,7 @@ exports.getTransactions = async (req, res) => {
 	try {
 		const transactions = await Transaction.findAll({
 			attributes: {
-				exclude: ['userId', 'createdAt', 'updatedAt'],
+				exclude: ['userId', 'updatedAt'],
 			},
 			order: [['createdAt', 'DESC']],
 			include: [
@@ -223,6 +229,26 @@ exports.addTransaction = async (req, res) => {
 	try {
 		const { body, user } = req;
 		const userId = user.id;
+		const date = Date.now();
+		const order_id = `${userId}-${date}`;
+		const name = body.name.split(' ');
+		let parameter = {
+			transaction_details: {
+				order_id,
+				gross_amount: body.income,
+			},
+			credit_card: {
+				secure: true,
+			},
+			customer_details: {
+				first_name: name[0],
+				last_name: name[name.length - 1],
+				email: body.email,
+				phone: body.phone,
+			},
+		};
+
+		const payment = await snap.createTransaction(parameter);
 		const transactionData = {
 			...body,
 			transactionProducts: JSON.parse(req.body.transactionProducts),
@@ -249,6 +275,7 @@ exports.addTransaction = async (req, res) => {
 			message: messageSuccess('Add User'),
 			data: {
 				transaction,
+				payment,
 			},
 		});
 	} catch (err) {
