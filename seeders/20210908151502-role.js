@@ -11,11 +11,13 @@ module.exports = {
 		 *   isBetaMember: false
 		 * }], {});
 		 */
-		await queryInterface.bulkInsert('Roles', [
+		await queryInterface.bulkInsert('roles', [
 			{
+				id: 1,
 				role: 'admin',
 			},
 			{
+				id: 2,
 				role: 'user',
 			},
 		]);
@@ -28,6 +30,6 @@ module.exports = {
 		 * Example:
 		 * await queryInterface.bulkDelete('People', null, {});
 		 */
-		await queryInterface.bulkDelete('Roles', null, {});
+		await queryInterface.bulkDelete('roles', null, {});
 	},
 };
