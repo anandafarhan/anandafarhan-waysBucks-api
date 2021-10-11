@@ -17,6 +17,10 @@ module.exports = {
 			image: {
 				type: Sequelize.STRING,
 			},
+			status: {
+				type: Sequelize.BOOLEAN,
+				defaultValue: 0,
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
@@ -25,9 +29,7 @@ module.exports = {
 			updatedAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
-				defaultValue: Sequelize.literal(
-					'CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()'
-				),
+				defaultValue: Sequelize.literal('CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()'),
 			},
 		});
 	},
