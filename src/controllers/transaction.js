@@ -39,27 +39,24 @@ exports.getTransactions = async (req, res) => {
 			include: [
 				{
 					model: User,
-					as: 'user',
 					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
-					as: 'transactionProducts',
+					as: 'TransactionProducts',
 					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
-							as: 'product',
 							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
-							as: 'transactionToppings',
+							as: 'TransactionToppings',
 							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
-									as: 'topping',
 									attributes: ['name', 'price', 'image'],
 								},
 							],
@@ -105,27 +102,24 @@ exports.getTransaction = async (req, res) => {
 			include: [
 				{
 					model: User,
-					as: 'user',
 					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
-					as: 'transactionProducts',
+					as: 'TransactionProducts',
 					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
-							as: 'product',
 							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
-							as: 'transactionToppings',
+							as: 'TransactionToppings',
 							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
-									as: 'topping',
 									attributes: ['name', 'price', 'image'],
 								},
 							],
@@ -163,7 +157,7 @@ exports.getUserTransactions = async (req, res) => {
 		const { id } = req.user;
 		const transaction = await Transaction.findAll({
 			where: {
-				Userid: id,
+				userId: id,
 			},
 			attributes: {
 				exclude: ['userId', 'updatedAt'],
@@ -172,27 +166,24 @@ exports.getUserTransactions = async (req, res) => {
 			include: [
 				{
 					model: User,
-					as: 'user',
 					attributes: ['id', 'fullName', 'email'],
 				},
 				{
 					model: TransactionProduct,
-					as: 'transactionProducts',
+					as: 'TransactionProducts',
 					attributes: ['id', 'qty'],
 					include: [
 						{
 							model: Product,
-							as: 'product',
 							attributes: ['name', 'price', 'image'],
 						},
 						{
 							model: TransactionTopping,
-							as: 'transactionToppings',
+							as: 'TransactionToppings',
 							attributes: ['toppingId'],
 							include: [
 								{
 									model: Topping,
-									as: 'topping',
 									attributes: ['name', 'price', 'image'],
 								},
 							],
@@ -251,7 +242,7 @@ exports.addTransaction = async (req, res) => {
 		const payment = await snap.createTransaction(parameter);
 		const transactionData = {
 			...body,
-			transactionProducts: JSON.parse(req.body.transactionProducts),
+			TransactionProducts: JSON.parse(req.body.TransactionProducts),
 			status: 'Waiting Approval',
 			userId,
 			attachment: req.file.path,
@@ -260,10 +251,10 @@ exports.addTransaction = async (req, res) => {
 		const transaction = await Transaction.create(transactionData, {
 			include: [
 				{
-					association: 'transactionProducts',
+					association: 'TransactionProducts',
 					include: [
 						{
-							association: 'transactionToppings',
+							association: 'TransactionToppings',
 						},
 					],
 				},
@@ -272,7 +263,7 @@ exports.addTransaction = async (req, res) => {
 
 		res.status(201).send({
 			status: success,
-			message: messageSuccess('Add User'),
+			message: messageSuccess('Add User Transaction'),
 			data: {
 				transaction,
 				payment,
